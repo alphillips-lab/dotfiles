@@ -1,0 +1,138 @@
+# Custom Aliases and Functions
+
+# General Use Aliases
+alias tmux="tmux -2"
+alias src="source ~/.bashrc"
+alias srct="tmux source-file /home/$USER/.tmux.conf"
+alias l="ls -lah"
+alias v="nvim"
+alias vim="nvim"
+alias xc="xclip -sel clip -f | xclip -sel p"
+alias catall="find . -type f -exec cat {} \;"
+alias ba="vim /home/$USER/.bash_aliases"
+
+# CUSTOM ALIASES/FUNCTIONS
+export PATH="$PATH:/home/$USER/scripts"
+
+# CUSTOM VIRTUAL ENVIRONMENTS
+alias ref="deactivate 2>/dev/null; source /home/$USER/venv/ref/bin/activate"
+
+# Tell me what virtual environments I have
+function venvs() {
+    ls ~/venvs/
+}
+
+# Refinery and Analysis Aliases
+alias emit="r.emit" 
+alias s="shac"
+alias pm="pemeta"
+
+# Always activate the refinery virtual environment
+source /home/$USER/venvs/ref/bin/activate
+
+function binja(){
+    # if no arguments, open binja
+    if [ $# -eq 0 ]; then
+	    nohup /home/$USER/binaryninja/binaryninja > /dev/null 2>&1 &
+    else
+	    nohup /home/$USER/binaryninja/binaryninja "$1" > /dev/null 2>&1 &
+    fi
+}
+function 7x () {
+    infile="$1";
+    shift;
+    args="$@";
+    passwords=('infected' 'Infected' 'INFECTED' 'infected!' 'notinfected' 'virus' 'malware' 'dangerous' 'password' 'Passw0rd' '123' 'unzip-me');
+    for p in ${passwords[@]};
+    do
+        7z t "$infile" -p${p} && 7z x "$infile" -p${p} "$args" && break;
+    done
+}
+function sha(){
+	sha256sum "$@" 2>/dev/null
+}
+function shac(){
+    # if no args, use current directory
+    if [ $# -eq 0 ]; then
+        sha256sum * 2>/dev/null | cut -d ' ' -f 1 | xclip -sel clip -f | xclip -sel p
+        sha256sum * 2>/dev/null
+    else
+	    sha256sum "$@"  2>/dev/null | cut -d' ' -f1 | xclip -sel clip -f | xclip -sel p
+    	sha256sum "$@"  2>/dev/null
+    fi
+}
+function notes(){
+	nohup obsidian >/dev/null 2>&1 &
+}
+function defang(){
+	r.emit | r.defang | xc -f
+	echo
+}
+function ht(){
+	history | awk '{CMD[$2]++;count++;}END { for (a in CMD)print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | column -c3 -s " " -t | sort -nr | nl |  head -n10
+}
+function pediff () {
+        vimdiff -d <(readpe "$1"; pehash -a "$1") <(readpe "$2"; pehash -a "$2")
+}
+function pemeta(){
+    # if arg1 is -S cat the file
+    if [ "$1" == "-S" ]; then
+        cat "$2" | r.pemeta -S
+    elif [ "$1" == "-I" ]; then
+        cat "$2" | r.pemeta -I
+    elif [ "$1" == "-E" ]; then
+        cat "$2" | r.pemeta -E
+    else
+	    cat "$1" | r.pemeta
+    fi
+}
+function str(){
+    # if there are no arguments
+    if [ $# -eq 0 ]; then
+            # store stdout in variable
+            str=$(cat)
+        	echo "---------------------------"
+        	echo "|   SEARCH REFINERY XTP   |"
+        	echo "---------------------------"
+        	echo
+            echo "$str" | r.xtp
+            echo
+        	echo "---------------------------"
+        	echo "|  SEARCH UTF-8 STRINGS   |"
+        	echo "---------------------------"
+        	echo
+        	echo "$str" | strings -n 6 -e S
+        	echo
+        	echo "---------------------------"
+        	echo "|  SEARCH UTF-16 STRINGS  |"
+        	echo "---------------------------"
+        	echo
+        	echo "$str" | strings -n 6 -e b -e l
+    else
+        	echo "---------------------------"
+        	echo "|   SEARCH REFINERY XTP   |"
+        	echo "---------------------------"
+        	echo
+            cat "$1" | r.xtp
+            echo
+        	echo "---------------------------"
+        	echo "|  SEARCH UTF-8 STRINGS   |"
+        	echo "---------------------------"
+        	echo
+        	strings -n 6 -e S "$1"
+        	echo
+        	echo "---------------------------"
+        	echo "|  SEARCH UTF-16 STRINGS  |"
+        	echo "---------------------------"
+        	echo
+        	strings -n 6 -e b -e l "$1"
+    fi
+}
+function vstr(){
+    # if there are no arguments
+    if [ $# -eq 0 ]; then
+        str | vim -
+    else
+        vim <(str "$1")
+    fi
+}

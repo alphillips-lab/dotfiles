@@ -1,0 +1,23 @@
+" CUSTOM VIM MACROS
+
+" Set numbers
+:set number
+
+filetype plugin indent on
+" show existing tab with 4 spaces width
+set tabstop=4
+" when indenting with '>', use 4 spaces width
+set shiftwidth=4
+" On pressing tab, insert 4 spaces
+set expandtab
+
+
+" Set Ctrl-C to copy in visual mode to both buffers
+:vmap <C-c> "+y :let @*=@+<CR>
+
+" Set mouse in vim (so tmux hands it over)
+:set mouse=a
+
+" Use bash profile
+:set shell=bash\ --login
+:set shellcmdflag=-ic
