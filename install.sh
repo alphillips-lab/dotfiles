@@ -40,7 +40,7 @@ if ! command -v git &> /dev/null || ! command -v curl &> /dev/null; then
     sudo apt-get update
     sudo apt-get install -y git curl
   else
-    read -p "Install git and curl? [Y/n] " -n 1 -r
+    read -p "Install git and curl? [Y/n] " -n 1 -r < /dev/tty
     echo
     if [[ $REPLY =~ ^[Yy]$ ]] || [[ -z $REPLY ]]; then
       sudo apt-get update

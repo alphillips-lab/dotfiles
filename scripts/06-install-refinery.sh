@@ -13,7 +13,7 @@ ask_yes_no() {
   if [ -n "$YES_FLAG" ]; then
     return 0
   fi
-  read -p "$prompt [Y/n] " -n 1 -r
+  read -p "$prompt [Y/n] " -n 1 -r < /dev/tty
   echo
   if [[ $REPLY =~ ^[Yy]$ ]] || [[ -z $REPLY ]]; then
     return 0
